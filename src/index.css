@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-mineShaft: #484848;
+  --inter-yellow: #ffd81a;
+  --inter-orange: #ff7a1a;
+}
+
+@layer base {
+  html {
+    @apply text-mineShaft;
+  }
+}
