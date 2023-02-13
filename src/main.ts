@@ -1,4 +1,4 @@
-import { abciQuery } from './abci-query';
+import { vstorageQuery } from './vstorage-query';
 
 const fetchRPCAddr = async (netconfigURL: string) => {
   const response = await fetch(netconfigURL, {
@@ -30,10 +30,7 @@ const tryRedirect = async () => {
   let endorsedUI;
 
   try {
-    const data = await abciQuery(
-      rpc,
-      '/custom/vstorage/data/published.vaultFactory.governance'
-    );
+    const data = await vstorageQuery(rpc, 'published.vaultFactory.governance');
     const { values } = JSON.parse(data.value);
     const value = JSON.parse(values[0]);
     const body = JSON.parse(value.body);
