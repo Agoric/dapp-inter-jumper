@@ -16,8 +16,5 @@
     "typescript": "^4.9.3",
     "vite": "^4.1.0"
   },
-  "dependencies": {
-    "@agoric/casting": "^0.3.3-dev-44ea14f.0",
-    "@endo/init": "^0.5.53"
-  }
+  "dependencies": {}
 }

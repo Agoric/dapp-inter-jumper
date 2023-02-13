@@ -1,5 +1,13 @@
-import '@endo/init';
-import { iterateLatest, makeFollower, makeLeader } from '@agoric/casting';
+import { abciQuery } from './abci-query';
+
+const fetchRPCAddr = async (netconfigURL: string) => {
+  const response = await fetch(netconfigURL, {
+    headers: { accept: 'application/json' },
+  });
+  const { rpcAddrs } = await response.json();
+
+  return rpcAddrs[Math.floor(Math.random() * rpcAddrs.length)];
+};
 
 const networkConfigUrl = (() => {
   const agoricNetName =
@@ -12,21 +20,27 @@ const networkConfigUrl = (() => {
   }
 })();
 
-const leader = makeLeader(networkConfigUrl);
-const follower = makeFollower(':published.vaultFactory.governance', leader);
-
-type Params = { current: { EndorsedUI: { type: 'string'; value: string } } };
-
 const setMessage = (message: string) => {
   document?.getElementById('msg')?.replaceChildren(message);
   console.info(message);
 };
 
 const tryRedirect = async () => {
+  const rpc = await fetchRPCAddr(networkConfigUrl);
   let endorsedUI;
-  for await (const { value } of iterateLatest<{ value: Params }>(follower)) {
-    endorsedUI = value.current.EndorsedUI;
-    break;
+
+  try {
+    const data = await abciQuery(
+      rpc,
+      '/custom/vstorage/data/published.vaultFactory.governance'
+    );
+    const { values } = JSON.parse(data.value);
+    const value = JSON.parse(values[0]);
+    const body = JSON.parse(value.body);
+    endorsedUI = body.current.EndorsedUI;
+  } catch {
+    setMessage('Not found.');
+    return;
   }
 
   if (!endorsedUI) {
