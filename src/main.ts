@@ -1,12 +1,9 @@
 import '@endo/init';
 import { iterateLatest, makeFollower, makeLeader } from '@agoric/casting';
 
-const urlSearchParams = new Proxy(new URLSearchParams(window.location.search), {
-  get: (searchParams, prop) => searchParams.get(prop.toString()),
-}) as { network?: string };
-
 const networkConfigUrl = (() => {
-  const agoricNetName = urlSearchParams.network ?? 'main';
+  const agoricNetName =
+    new URLSearchParams(window.location.search).get('network') ?? 'main';
 
   if (agoricNetName === 'local') {
     return 'https://wallet.agoric.app/wallet/network-config';
@@ -16,10 +13,14 @@ const networkConfigUrl = (() => {
 })();
 
 const leader = makeLeader(networkConfigUrl);
-const castingSpec = ':published.vaultFactory.governance';
-const follower = makeFollower(castingSpec, leader);
+const follower = makeFollower(':published.vaultFactory.governance', leader);
 
 type Params = { current: { EndorsedUI: { type: 'string'; value: string } } };
+
+const setMessage = (message: string) => {
+  document?.getElementById('msg')?.replaceChildren(message);
+  console.info(message);
+};
 
 const tryRedirect = async () => {
   let endorsedUI;
@@ -29,11 +30,9 @@ const tryRedirect = async () => {
   }
 
   if (!endorsedUI) {
-    document?.getElementById('msg')?.replaceChildren('Not found.');
+    setMessage('Not found.');
   } else if (endorsedUI.value === 'NO ENDORSEMENT') {
-    document
-      ?.getElementById('msg')
-      ?.replaceChildren('Not found: No Endorsement');
+    setMessage('Not found: No Endorsement');
   } else {
     try {
       const href = `https://${endorsedUI.value}.ipfs.cf-ipfs.com`;
@@ -41,9 +40,7 @@ const tryRedirect = async () => {
       location.replace(redirectUrl);
     } catch (e) {
       console.error(e, endorsedUI.value);
-      document
-        ?.getElementById('msg')
-        ?.replaceChildren('Not found: ', endorsedUI.value);
+      setMessage('Not found: ' + endorsedUI.value);
     }
   }
 };
