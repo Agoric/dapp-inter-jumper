@@ -32,7 +32,8 @@ const tryRedirect = async () => {
   try {
     const data = await vstorageQuery(rpc, 'published.vaultFactory.governance');
     const { values } = JSON.parse(data.value);
-    const value = JSON.parse(values[0]);
+    const latestValue = values[values.length - 1];
+    const value = JSON.parse(latestValue);
     const body = JSON.parse(value.body);
     endorsedUI = body.current.EndorsedUI;
   } catch {
