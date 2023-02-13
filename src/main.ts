@@ -9,10 +9,9 @@ const fetchRPCAddr = async (netconfigURL: string) => {
   return rpcAddrs[Math.floor(Math.random() * rpcAddrs.length)];
 };
 
-const networkConfigUrl = (() => {
-  const agoricNetName =
-    new URLSearchParams(window.location.search).get('network') ?? 'main';
+const agoricNetName = new URLSearchParams(window.location.search).get('network') ?? 'main';
 
+const networkConfigUrl = (() => {
   if (agoricNetName === 'local') {
     return 'https://wallet.agoric.app/wallet/network-config';
   } else {
@@ -20,6 +19,7 @@ const networkConfigUrl = (() => {
   }
 })();
 
+const walletParam = (agoricNetName !== "main" ? "?wallet=main" : "");
 const setMessage = (message: string) => {
   document?.getElementById('msg')?.replaceChildren(message);
   console.info(message);
@@ -47,7 +47,7 @@ const tryRedirect = async () => {
     setMessage('Not found: No Endorsement');
   } else {
     try {
-      const href = `https://${endorsedUI.value}.ipfs.cf-ipfs.com`;
+      const href = `https://${endorsedUI.value}.ipfs.cf-ipfs.com/${walletParam}`;
       const redirectUrl = new URL(href);
       location.replace(redirectUrl);
     } catch (e) {
