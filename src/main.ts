@@ -19,7 +19,7 @@ const networkConfigUrl = (() => {
   }
 })();
 
-const walletParam = (agoricNetName !== "main" ? "?wallet=main" : "");
+const walletParam = (agoricNetName == "main" ?  '' : '?wallet=main');
 const setMessage = (message: string) => {
   document?.getElementById('msg')?.replaceChildren(message);
   console.info(message);
