@@ -19,11 +19,17 @@ const networkConfigUrl = (() => {
   }
 })();
 
-const redirectParams = new URLSearchParams();
-if (agoricNetName !== "main") {
-  redirectParams.append('wallet', 'main');
-  redirectParams.append('network', agoricNetName);
-}
+const redirectParams = (() => {
+  if (agoricNetName !== "main") {
+    const redirectParams = new URLSearchParams();
+    redirectParams.append('wallet', 'main');
+    redirectParams.append('network', agoricNetName);
+    return '?' + redirectParams.toString();
+  } else {
+    return '';
+  }
+})();
+
 
 const setMessage = (message: string) => {
   document?.getElementById('msg')?.replaceChildren(message);
@@ -52,7 +58,7 @@ const tryRedirect = async () => {
     setMessage('Not found: No Endorsement');
   } else {
     try {
-      const href = `https://${endorsedUI.value}.ipfs.cf-ipfs.com/${redirectParams.getAll.length > 0 ? '?' + redirectParams.toString() : ''}`;
+      const href = `https://${endorsedUI.value}.ipfs.cf-ipfs.com/${redirectParams}`;
       const redirectUrl = new URL(href);
       location.replace(redirectUrl);
     } catch (e) {
