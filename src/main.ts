@@ -52,7 +52,7 @@ const tryRedirect = async () => {
     setMessage('Not found: No Endorsement');
   } else {
     try {
-      const href = `https://${endorsedUI.value}.ipfs.cf-ipfs.com/?${redirectParams.toString()}`;
+      const href = `https://${endorsedUI.value}.ipfs.cf-ipfs.com/${redirectParams.getAll.length > 0 ? '?' + redirectParams.toString() : ''}`;
       const redirectUrl = new URL(href);
       location.replace(redirectUrl);
     } catch (e) {
