@@ -45,7 +45,7 @@ const tryRedirect = async () => {
     const { values } = JSON.parse(data.value);
     const latestValue = values[values.length - 1];
     const value = JSON.parse(latestValue);
-    const body = JSON.parse(value.body);
+    const body = JSON.parse(value.body.substring(1));
     endorsedUI = body.current.EndorsedUI;
   } catch {
     setMessage('Not found.');
