@@ -9,7 +9,8 @@ const fetchRPCAddr = async (netconfigURL: string) => {
   return rpcAddrs[Math.floor(Math.random() * rpcAddrs.length)];
 };
 
-const agoricNetName = new URLSearchParams(window.location.search).get('network') ?? 'main';
+const agoricNetName =
+  new URLSearchParams(window.location.search).get('network') ?? 'main';
 
 const networkConfigUrl = (() => {
   if (agoricNetName === 'local') {
@@ -20,7 +21,7 @@ const networkConfigUrl = (() => {
 })();
 
 const redirectParams = (() => {
-  if (agoricNetName !== "main") {
+  if (agoricNetName !== 'main') {
     const redirectParams = new URLSearchParams();
     redirectParams.append('wallet', 'main');
     redirectParams.append('network', agoricNetName);
@@ -30,7 +31,6 @@ const redirectParams = (() => {
   }
 })();
 
-
 const setMessage = (message: string) => {
   document?.getElementById('msg')?.replaceChildren(message);
   console.info(message);
@@ -38,7 +38,7 @@ const setMessage = (message: string) => {
 
 const tryRedirect = async () => {
   const rpc = await fetchRPCAddr(networkConfigUrl);
-  let endorsedUI;
+  let referencedUI;
 
   try {
     const data = await vstorageQuery(rpc, 'published.vaultFactory.governance');
@@ -46,24 +46,23 @@ const tryRedirect = async () => {
     const latestValue = values[values.length - 1];
     const value = JSON.parse(latestValue);
     const body = JSON.parse(value.body.substring(1));
-    endorsedUI = body.current.EndorsedUI;
+    // TODO: remove backwards-compatible "EndorsedUI" after contract change.
+    referencedUI = body.current.ReferencedUI || body.current.EndorsedUI;
   } catch {
     setMessage('Not found.');
     return;
   }
 
-  if (!endorsedUI) {
+  if (!referencedUI) {
     setMessage('Not found.');
-  } else if (endorsedUI.value === 'NO ENDORSEMENT') {
-    setMessage('Not found: No Endorsement');
   } else {
     try {
-      const href = `https://${endorsedUI.value}.ipfs.cf-ipfs.com/${redirectParams}`;
+      const href = `https://${referencedUI.value}.ipfs.cf-ipfs.com/${redirectParams}`;
       const redirectUrl = new URL(href);
       location.replace(redirectUrl);
     } catch (e) {
-      console.error(e, endorsedUI.value);
-      setMessage('Not found: ' + endorsedUI.value);
+      console.error(e, referencedUI.value);
+      setMessage('Not found: ' + referencedUI.value);
     }
   }
 };
