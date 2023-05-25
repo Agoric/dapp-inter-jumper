@@ -1,7 +1,8 @@
 # dapp-inter-jumper
+
 Jumper page for dapp-inter.
 
-Simply redirects to the currently endorsed [dapp-inter](https://github.com/Agoric/dapp-inter)
+Simply redirects to the currently referenced [dapp-inter](https://github.com/Agoric/dapp-inter)
 site as voted on by the Inter Protocol Econ Committee.
 
 # Development
