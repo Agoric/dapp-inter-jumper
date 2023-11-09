@@ -120,18 +120,13 @@ const tryRedirect = async () => {
 
   try {
     redirectUrl = await getRedirectUrl(apiAddrs);
-  } catch {
-    // Retry once as specified in https://github.com/Agoric/ui-kit/issues/56
-    try {
-      redirectUrl = await getRedirectUrl(apiAddrs);
-    } catch (e) {
-      didFail = true;
-      console.error(e);
-      hideMessage();
-      showError(
-        'Problem connecting to chain - this may be due to RPC connection issues. See console for more information or please try again later.'
-      );
-    }
+  } catch (e) {
+    didFail = true;
+    console.error(e);
+    hideMessage();
+    showError(
+      'Problem connecting to chain - this may be due to RPC connection issues. See console for more information or please try again later.'
+    );
   }
 
   if (banner) {
