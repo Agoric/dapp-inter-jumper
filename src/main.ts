@@ -1,3 +1,4 @@
+import { timeoutDurationMS } from './constants';
 import { vstorageQuery } from './vstorage-query';
 
 const agoricNetName =
@@ -33,10 +34,10 @@ const fetchNetworkConfig = async (netconfigURL: string) => {
   const response = await fetch(netconfigURL, {
     headers: { accept: 'application/json' },
   });
-  const { rpcAddrs, dappInterJumperBanner } = await response.json();
+  const { apiAddrs, dappInterJumperBanner } = await response.json();
 
   return {
-    rpc: rpcAddrs[Math.floor(Math.random() * rpcAddrs.length)],
+    apiAddrs,
     banner: bannerParams || dappInterJumperBanner,
   };
 };
@@ -77,8 +78,11 @@ const showError = (msg: string) => {
   notFoundMessage.replaceChildren(msg);
 };
 
-const getRedirectUrl = async (rpc: string) => {
-  const data = await vstorageQuery(rpc, 'published.vaultFactory.governance');
+const getRedirectUrl = async (apiAddrs: string[]) => {
+  const data = await vstorageQuery(
+    apiAddrs,
+    'published.vaultFactory.governance'
+  );
   const { values } = JSON.parse(data.value);
   const latestValue = values[values.length - 1];
   const value = JSON.parse(latestValue);
@@ -104,18 +108,25 @@ const tryRedirect = async () => {
     throw new Error('Unexpected error, network config undefined');
   }
 
-  const rpc = networkConfig.rpc;
-  const banner = networkConfig.banner;
-  const timeoutDurationMS = 10_000;
+  const { apiAddrs, banner } = networkConfig;
   let redirectUrl: URL | undefined = undefined;
+  let didFail = false;
+
+  setTimeout(() => {
+    if (!didFail && !redirectUrl) {
+      showError('Connection is taking longer than expected. Please wait.');
+    }
+  }, timeoutDurationMS);
 
   try {
-    redirectUrl = await (Promise.race([
-      getRedirectUrl(rpc),
-      new Promise((_, rej) => setTimeout(rej, timeoutDurationMS)),
-    ]) as Promise<URL>);
-  } catch {
-    showError('No endorsed UI found.');
+    redirectUrl = await getRedirectUrl(apiAddrs);
+  } catch (e) {
+    didFail = true;
+    console.error(e);
+    hideMessage();
+    showError(
+      'Problem connecting to chain - this may be due to RPC connection issues. See console for more information or please try again later.'
+    );
   }
 
   if (banner) {
