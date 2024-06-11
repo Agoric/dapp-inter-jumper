@@ -89,7 +89,7 @@ const getRedirectUrl = async (apiAddrs: string[]) => {
   const body = JSON.parse(value.body.substring(1));
   // TODO: remove backwards-compatible "EndorsedUI" after contract change.
   const referencedUI = body.current.ReferencedUI || body.current.EndorsedUI;
-  const href = `https://${referencedUI.value}.ipfs.cf-ipfs.com/${redirectParams}`;
+  const href = `https://${referencedUI.value}.ipfs.dweb.link/${redirectParams}`;
   return new URL(href);
 };
 
